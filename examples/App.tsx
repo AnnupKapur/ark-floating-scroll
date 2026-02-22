@@ -148,7 +148,7 @@ function DynamicListDemo() {
 function App() {
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: 24, fontFamily: "system-ui, sans-serif" }}>
-      <h1>🚀 OptimisedScroll Demo</h1>
+      <h1>🚀 Ark Floating Scroll Demo</h1>
       <p style={{ color: "#555" }}>
         Each list below uses <code>&lt;VirtualList&gt;</code> to render only the
         visible rows. Open DevTools → Elements to confirm the DOM stays small.

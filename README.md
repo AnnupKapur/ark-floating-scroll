@@ -1,11 +1,11 @@
-# optimised-scroll
+# ark-floating-scroll
 
 A high-performance virtualized list component for React. Renders only the items visible in the viewport, dramatically reducing DOM nodes and improving performance for long lists.
 
 ## Installation
 
 ```bash
-npm install optimised-scroll
+npm install ark-floating-scroll
 ```
 
 **Peer dependencies:** React ≥ 16.8.0
@@ -13,7 +13,7 @@ npm install optimised-scroll
 ## Quick Start
 
 ```tsx
-import { VirtualList } from "optimised-scroll";
+import { VirtualList } from "ark-floating-scroll";
 
 const items = Array.from({ length: 10000 }, (_, i) => `Item ${i}`);
 
