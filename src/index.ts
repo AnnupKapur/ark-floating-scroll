@@ -1,2 +1,2 @@
 export { VirtualList } from "./VirtualList";
-export type { VirtualListProps } from "./VirtualList";
+export type { VirtualListProps, VirtualListHandle } from "./VirtualList";

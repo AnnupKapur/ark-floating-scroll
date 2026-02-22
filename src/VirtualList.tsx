@@ -3,9 +3,17 @@ import React, {
   useRef,
   useCallback,
   useEffect,
+  useImperativeHandle,
+  forwardRef,
   CSSProperties,
   ReactNode,
+  Ref,
 } from "react";
+
+export interface VirtualListHandle {
+  /** Scroll to bring the item at `index` into view */
+  scrollToIndex: (index: number, behavior?: ScrollBehavior) => void;
+}
 
 export interface VirtualListProps<T> {
   /** Array of items to render */
@@ -34,21 +42,34 @@ function defaultRenderItem<T>(item: T, index: number): ReactNode {
  * A virtualized list component that renders only the items visible
  * in the viewport, plus a configurable overscan buffer.
  */
-export function VirtualList<T>({
-  items,
-  itemHeight,
-  height = 400,
-  width = "100%",
-  overscan = 5,
-  renderItem = defaultRenderItem,
-  className,
-  style,
-}: VirtualListProps<T>) {
+function VirtualListInner<T>(
+  {
+    items,
+    itemHeight,
+    height = 400,
+    width = "100%",
+    overscan = 5,
+    renderItem = defaultRenderItem,
+    className,
+    style,
+  }: VirtualListProps<T>,
+  ref: Ref<VirtualListHandle>
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const rafRef = useRef<number | null>(null);
 
   const totalHeight = items.length * itemHeight;
+
+  // Expose scrollToIndex to parent via ref
+  useImperativeHandle(ref, () => ({
+    scrollToIndex(index: number, behavior: ScrollBehavior = "auto") {
+      const container = containerRef.current;
+      if (!container) return;
+      const clamped = Math.max(0, Math.min(index, items.length - 1));
+      container.scrollTo({ top: clamped * itemHeight, behavior });
+    },
+  }), [items.length, itemHeight]);
 
   // Calculate visible range with overscan buffer
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
@@ -131,3 +152,8 @@ export function VirtualList<T>({
     </div>
   );
 }
+
+// forwardRef wrapper that preserves the generic type parameter
+export const VirtualList = forwardRef(VirtualListInner) as <T>(
+  props: VirtualListProps<T> & { ref?: Ref<VirtualListHandle> }
+) => ReactNode;

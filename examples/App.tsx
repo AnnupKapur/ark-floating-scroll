@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { VirtualList } from "../src";
+import { VirtualList, VirtualListHandle } from "../src";
 
 // ---------------------------------------------------------------------------
 // Demo 1: Simple string list (10,000 items)
@@ -143,6 +143,68 @@ function DynamicListDemo() {
 }
 
 // ---------------------------------------------------------------------------
+// Demo 4: Scroll to Index
+// ---------------------------------------------------------------------------
+function ScrollToIndexDemo() {
+  const listRef = useRef<VirtualListHandle>(null);
+  const [target, setTarget] = useState("500");
+  const items = Array.from({ length: 10_000 }, (_, i) => `Item ${i}`);
+
+  const handleGo = () => {
+    const index = parseInt(target, 10);
+    if (!isNaN(index)) {
+      listRef.current?.scrollToIndex(index, "smooth");
+    }
+  };
+
+  return (
+    <section>
+      <h2>Scroll to Index — 10,000 items</h2>
+      <div style={{ marginBottom: 8, display: "flex", gap: 8, alignItems: "center" }}>
+        <label>
+          Index:{" "}
+          <input
+            type="number"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            min={0}
+            max={9999}
+            style={{ width: 80, padding: "4px 8px" }}
+          />
+        </label>
+        <button onClick={handleGo}>Go (smooth)</button>
+        <button
+          onClick={() => {
+            const index = parseInt(target, 10);
+            if (!isNaN(index)) listRef.current?.scrollToIndex(index);
+          }}
+        >
+          Go (instant)
+        </button>
+      </div>
+      <VirtualList
+        ref={listRef}
+        items={items}
+        itemHeight={40}
+        height={300}
+        renderItem={(item, index) => (
+          <div
+            style={{
+              padding: "8px 12px",
+              borderBottom: "1px solid #eee",
+              background: index === parseInt(target, 10) ? "#d0ebff" : index % 2 === 0 ? "#fafafa" : "#fff",
+              fontWeight: index === parseInt(target, 10) ? "bold" : "normal",
+            }}
+          >
+            {item}
+          </div>
+        )}
+      />
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // App shell
 // ---------------------------------------------------------------------------
 function App() {
@@ -154,6 +216,7 @@ function App() {
         visible rows. Open DevTools → Elements to confirm the DOM stays small.
       </p>
       <SimpleListDemo />
+      <ScrollToIndexDemo />
       <ContactListDemo />
       <DynamicListDemo />
     </div>

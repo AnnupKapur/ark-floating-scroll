@@ -39,6 +39,7 @@ function App() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `ref` | `Ref<VirtualListHandle>` | — | Imperative handle with `scrollToIndex` |
 | `items` | `T[]` | *required* | Array of items to render |
 | `itemHeight` | `number` | *required* | Fixed height of each item in pixels |
 | `height` | `number` | `400` | Height of the scrollable container |
@@ -53,6 +54,36 @@ function App() {
 1. **Scroll Detection** — Listens to the container's `scroll` event, throttled via `requestAnimationFrame` for smooth 60fps updates.
 2. **Range Calculation** — Computes `startIndex` and `endIndex` from `scrollTop / itemHeight`, adding an `overscan` buffer.
 3. **DOM Recycling** — Only the visible slice of items is mounted in the DOM. Items outside the viewport are unmounted, keeping memory usage constant regardless of list size.
+
+## Scroll to Index
+
+Use an imperative ref to programmatically scroll to any item:
+
+```tsx
+import { useRef } from "react";
+import { VirtualList, VirtualListHandle } from "ark-floating-scroll";
+
+function App() {
+  const listRef = useRef<VirtualListHandle>(null);
+
+  return (
+    <>
+      <button onClick={() => listRef.current?.scrollToIndex(500, "smooth")}>
+        Go to item 500
+      </button>
+      <VirtualList
+        ref={listRef}
+        items={items}
+        itemHeight={40}
+        height={500}
+        renderItem={(item) => <div>{item}</div>}
+      />
+    </>
+  );
+}
+```
+
+`scrollToIndex(index, behavior?)` accepts an optional `ScrollBehavior` (`"auto"` or `"smooth"`). Defaults to `"auto"` (instant).
 
 ## TypeScript
 
@@ -85,4 +116,5 @@ Open DevTools → Elements to confirm only ~20-30 DOM nodes exist regardless of 
 ## License
 
 MIT
+
 # ark-floating-scroll
