@@ -32,7 +32,7 @@
   "author": "Annup Raj Kapur",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AnnupKapur/ark-floating-scroll"
+    "url": "git+https://github.com/AnnupKapur/ark-floating-scroll.git"
   },
   "license": "MIT",
   "peerDependencies": {
