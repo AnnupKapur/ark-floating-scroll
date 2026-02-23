@@ -10,10 +10,9 @@ function SimpleListDemo() {
 
   return (
     <section>
-      <h2>Simple List — 10,000 strings</h2>
+      <h2>Simple List — 10,000 strings (Auto-measured height)</h2>
       <VirtualList
         items={items}
-        itemHeight={40}
         height={300}
         renderItem={(item, index) => (
           <div
@@ -49,10 +48,9 @@ function ContactListDemo() {
 
   return (
     <section>
-      <h2>Contact List — 50,000 objects</h2>
+      <h2>Contact List — 50,000 objects (Auto-measured)</h2>
       <VirtualList<Contact>
         items={contacts}
-        itemHeight={60}
         height={350}
         renderItem={(contact) => (
           <div

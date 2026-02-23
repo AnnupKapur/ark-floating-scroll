@@ -41,7 +41,7 @@ function App() {
 |------|------|---------|-------------|
 | `ref` | `Ref<VirtualListHandle>` | — | Imperative handle with `scrollToIndex` |
 | `items` | `T[]` | *required* | Array of items to render |
-| `itemHeight` | `number` | *required* | Fixed height of each item in pixels |
+| `itemHeight` | `number` | *auto* | Fixed height of each item in pixels. If omitted, auto-calculated from first item. |
 | `height` | `number` | `400` | Height of the scrollable container |
 | `width` | `number \| string` | `"100%"` | Width of the scrollable container |
 | `overscan` | `number` | `5` | Extra items rendered above/below viewport |

@@ -6,6 +6,43 @@ const createItems = (count: number) =>
   Array.from({ length: count }, (_, i) => `Item ${i}`);
 
 describe("VirtualList", () => {
+  it("auto-calculates itemHeight from the first item if omitted", () => {
+    // Mock offsetHeight for JSDOM
+    const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "offsetHeight"
+    );
+    Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+      configurable: true,
+      value: 50,
+    });
+
+    const items = createItems(100);
+    const { container } = render(
+      <VirtualList
+        items={items}
+        height={200}
+        overscan={0}
+      />
+    );
+
+    // After first render, it should measure and then re-render with itemHeight=50
+    // height=200, itemHeight=50 -> 4 items visible
+    const rendered = container.querySelectorAll("div > div > div"); // Inner items
+    // First element in container is the wrapper, second is the spacer, then the items
+    const positioned = container.querySelectorAll<HTMLElement>("[style*='position: absolute']");
+    expect(positioned.length).toBe(4);
+    expect(positioned[0].style.height).toBe("50px");
+
+    // Restore original property
+    if (originalOffsetHeight) {
+      Object.defineProperty(HTMLElement.prototype, "offsetHeight", originalOffsetHeight);
+    } else {
+      // @ts-ignore
+      delete HTMLElement.prototype.offsetHeight;
+    }
+  });
+
   it("renders only visible items plus overscan", () => {
     const items = createItems(1000);
     // height=200, itemHeight=50 → 4 visible + 5 overscan below = 9 items

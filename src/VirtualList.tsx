@@ -18,8 +18,8 @@ export interface VirtualListHandle {
 export interface VirtualListProps<T> {
   /** Array of items to render */
   items: T[];
-  /** Fixed height of each item in pixels */
-  itemHeight: number;
+  /** Fixed height of each item in pixels. If omitted, it will be auto-calculated from the first item. */
+  itemHeight?: number;
   /** Height of the scrollable container in pixels (default: 400) */
   height?: number;
   /** Width of the scrollable container (default: "100%") */
@@ -45,7 +45,7 @@ function defaultRenderItem<T>(item: T, index: number): ReactNode {
 function VirtualListInner<T>(
   {
     items,
-    itemHeight,
+    itemHeight: propItemHeight,
     height = 400,
     width = "100%",
     overscan = 5,
@@ -58,6 +58,9 @@ function VirtualListInner<T>(
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const rafRef = useRef<number | null>(null);
+  const [measuredItemHeight, setMeasuredItemHeight] = useState(0);
+
+  const itemHeight = propItemHeight ?? measuredItemHeight;
 
   const totalHeight = items.length * itemHeight;
 
@@ -65,19 +68,19 @@ function VirtualListInner<T>(
   useImperativeHandle(ref, () => ({
     scrollToIndex(index: number, behavior: ScrollBehavior = "auto") {
       const container = containerRef.current;
-      if (!container) return;
+      if (!container || itemHeight === 0) return;
       const clamped = Math.max(0, Math.min(index, items.length - 1));
       container.scrollTo({ top: clamped * itemHeight, behavior });
     },
   }), [items.length, itemHeight]);
 
   // Calculate visible range with overscan buffer
-  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
-  const visibleCount = Math.ceil(height / itemHeight);
-  const endIndex = Math.min(
+  const startIndex = itemHeight > 0 ? Math.max(0, Math.floor(scrollTop / itemHeight) - overscan) : 0;
+  const visibleCount = itemHeight > 0 ? Math.ceil(height / itemHeight) : 1;
+  const endIndex = itemHeight > 0 ? Math.min(
     items.length,
     Math.floor(scrollTop / itemHeight) + visibleCount + overscan
-  );
+  ) : 1;
 
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
@@ -106,15 +109,22 @@ function VirtualListInner<T>(
   // Build only the visible items
   const visibleItems: ReactNode[] = [];
   for (let i = startIndex; i < endIndex; i++) {
+    const isMeasuring = itemHeight === 0 && i === 0;
     visibleItems.push(
       <div
         key={i}
+        ref={isMeasuring ? (el) => {
+          if (el && el.offsetHeight > 0) {
+            setMeasuredItemHeight(el.offsetHeight);
+          }
+        } : undefined}
         style={{
           position: "absolute",
           top: i * itemHeight,
           left: 0,
           right: 0,
-          height: itemHeight,
+          height: itemHeight > 0 ? itemHeight : undefined,
+          visibility: isMeasuring ? "hidden" : "visible",
           overflow: "hidden",
         }}
       >
