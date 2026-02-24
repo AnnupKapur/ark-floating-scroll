@@ -7,6 +7,7 @@ import React, {
   forwardRef,
   CSSProperties,
   ReactNode,
+  ReactElement,
   Ref,
 } from "react";
 
@@ -166,4 +167,4 @@ function VirtualListInner<T>(
 // forwardRef wrapper that preserves the generic type parameter
 export const VirtualList = forwardRef(VirtualListInner) as <T>(
   props: VirtualListProps<T> & { ref?: Ref<VirtualListHandle> }
-) => ReactNode;
+) => ReactElement;
