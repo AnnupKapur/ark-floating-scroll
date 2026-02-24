@@ -1,6 +1,6 @@
 {
   "name": "ark-floating-scroll",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A high-performance virtualized list component for React that renders only visible items",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
